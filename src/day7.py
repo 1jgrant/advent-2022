@@ -48,9 +48,9 @@ for line in terminal_lines:
         current_path += f'{current_dir}/'
         if current_path not in dir_hash:
             dir_hash[current_path] = {'path': current_path,
-                                      "sub_dirs": [],
+                                      "subdirs": [],
                                       "depth": depth,
-                                      "dirs_size": 0,
+                                      "subdirs_size": 0,
                                       "files_size": 0,
                                       "total_size": 0,
                                       'seen': False}
@@ -58,7 +58,7 @@ for line in terminal_lines:
         continue
     if line.startswith('dir'):
         [_, subdir] = line.split(' ')
-        dir_hash[current_path]['sub_dirs'].append(f'{current_path}{subdir}/')
+        dir_hash[current_path]['subdirs'].append(f'{current_path}{subdir}/')
         continue
     [file_size, _] = line.split(' ')
     dir_hash[current_path]['files_size'] += int(file_size)
@@ -68,13 +68,13 @@ depth_sorted_dirs = sorted(dirs_list, key=lambda dir: dir['depth'], reverse=True
 
 for dir_ref in depth_sorted_dirs:
     target_dir = dir_ref['path']
-    for subdir in dir_ref['sub_dirs']:
-        dir_hash[target_dir]['dirs_size'] += dir_hash[subdir]['files_size'] + dir_hash[subdir]['dirs_size']
-    dir_hash[target_dir]['total_size'] = dir_hash[target_dir]['dirs_size'] + dir_hash[target_dir]['files_size']
+    for subdir in dir_ref['subdirs']:
+        dir_hash[target_dir]['subdirs_size'] += dir_hash[subdir]['files_size'] + dir_hash[subdir]['subdirs_size']
+    dir_hash[target_dir]['total_size'] = dir_hash[target_dir]['subdirs_size'] + dir_hash[target_dir]['files_size']
 
 max_size = 100000
 under_max = [item['total_size'] for item in dir_hash.values() if item['total_size'] < max_size]
-print(sum(under_max))
+print('part 1:', sum(under_max))
 
 disk_space = 70000000
 required_space = 30000000
@@ -82,4 +82,4 @@ unused_space = disk_space - dir_hash['/']['total_size']
 
 smallest_option = min([dir['total_size'] for dir in dir_hash.values() if
                       unused_space + dir['total_size'] > required_space])
-print(smallest_option)
+print('part 2:', smallest_option)
